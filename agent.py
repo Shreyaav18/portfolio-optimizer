@@ -29,9 +29,12 @@ class PPOAgent:
         state = torch.FloatTensor(state).unsqueeze(0).to(self.device)
         
         with torch.no_grad():
-            action, log_prob, value = self.policy.get_action(state, deterministic)
-        
-        return action.cpu().numpy()[0], log_prob.cpu().item(), value.cpu().item()
+            if deterministic:
+                action, value = self.policy.get_action(state, deterministic)
+                return action.cpu().numpy()[0], None, value.cpu().item()
+            else:
+                action, log_prob, value = self.policy.get_action(state, deterministic)
+                return action.cpu().numpy()[0], log_prob.cpu().item(), value.cpu().item()
     
     def store_transition(self, state, action, reward, log_prob, value, done):
         self.states.append(state)

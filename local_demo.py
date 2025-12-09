@@ -27,14 +27,14 @@ print(f"Loading trained model from {MODEL_PATH}...")
 agent.load(MODEL_PATH)
 
 print("\nRunning backtest on test data...")
-state = test_env.reset()
+state, _ = test_env.reset()
 done = False
 portfolio_values = [test_env.portfolio_value]
 actions_log = []
 
 while not done:
     action, _, _ = agent.get_action(state, deterministic=True)
-    state, reward, done, _ = test_env.step(action)
+    state, reward, done, truncated, _ = test_env.step(action)
     
     portfolio_values.append(test_env.portfolio_value)
     actions_log.append(action)

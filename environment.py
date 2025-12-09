@@ -23,14 +23,16 @@ class PortfolioEnv(gymnasium.Env):
         
         self.reset()
     
-    def reset(self):
+    def reset(self, seed=None, options=None):
+        super().reset(seed=seed)
+        
         self.current_step = self.lookback
         self.balance = self.initial_balance
         self.shares_held = np.zeros(self.n_stocks)
         self.portfolio_value = self.initial_balance
         self.previous_portfolio_value = self.initial_balance
         
-        return self._get_observation()
+        return self._get_observation(), {}
     
     def _get_observation(self):
         start = self.current_step - self.lookback
@@ -107,8 +109,10 @@ class PortfolioEnv(gymnasium.Env):
         
         if self.current_step >= len(self.df) - 1:
             done = True
+            truncated = False
         else:
             done = False
+            truncated = False
         
         next_prices = []
         for i in range(self.n_stocks):
@@ -122,7 +126,7 @@ class PortfolioEnv(gymnasium.Env):
         
         obs = self._get_observation()
         
-        return obs, reward, done, {}
+        return obs, reward, done, truncated, {}
     
     def _calculate_reward(self):
         returns = (self.portfolio_value - self.previous_portfolio_value) / self.previous_portfolio_value
